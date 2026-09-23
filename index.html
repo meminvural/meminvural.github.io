@@ -4114,8 +4114,13 @@ $('ayYenileBtn').addEventListener('click', loadAyarListe);
 $('ayEkleBtn').addEventListener('click', async function() {
   const deger = $('ayYeniDeger').value.trim();
   if (!deger) { toast(i18nT('Değer girin.'), true); return; }
+  const tablo = $('ayTablo').value;
   try {
-    await api('manage-lists', { method: 'POST', body: { action: 'add', table: $('ayTablo').value, deger: deger } });
+    // 'kategoriler' tablosu artik cok-alanli (ad + muhasebe_kodu) - backend 'veri' bekliyor, 'deger' degil.
+    const body = (tablo === 'kategoriler')
+      ? { action: 'add', table: tablo, veri: { ad: deger } }
+      : { action: 'add', table: tablo, deger: deger };
+    await api('manage-lists', { method: 'POST', body: body });
     toast(i18nT('Eklendi.')); $('ayYeniDeger').value = ''; loadAyarListe();
   } catch (e) { toast(e.message, true); }
 });
